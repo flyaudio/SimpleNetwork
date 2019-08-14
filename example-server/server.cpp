@@ -35,7 +35,7 @@ void * send_client(void * m) {
 			    to_string(min)                 + ":" +
 			    to_string(sec)                 + "\r\n";
 		cerr << date << endl;
-		tcp.Send(date, desc->id);
+		tcp.Send(date, desc->id);  // 
 		sleep(time_send);
 	}
 	pthread_exit(NULL);
@@ -44,18 +44,18 @@ void * send_client(void * m) {
 
 void * received(void * m)
 {
-        pthread_detach(pthread_self());
+        pthread_detach(pthread_self());    //release thread resource 
 	vector<descript_socket*> desc;
 	while(1)
 	{
-		desc = tcp.getMessage();
+		desc = tcp.getMessage();     // lock thread  return message
 		for(unsigned int i = 0; i < desc.size(); i++) {
 			if( desc[i]->message != "" )
 			{
 				if(!desc[i]->enable_message_runtime) 
 				{
 					desc[i]->enable_message_runtime = true;
-			                if( pthread_create(&msg1[num_message], NULL, send_client, (void *) desc[i]) == 0) {
+			                if( pthread_create(&msg1[num_message], NULL, send_client, (void *) desc[i]) == 0) {   // start send thread
 						cerr << "ATTIVA THREAD INVIO MESSAGGI" << endl;
 					}
 					num_message++;
@@ -81,14 +81,14 @@ int main(int argc, char **argv)
 		return 0;
 	}
 	if(argc == 3)
-		time_send = atoi(argv[2]);
-	std::signal(SIGINT, close_app);
+		time_send = atoi(argv[2]);   //  tranfer stirng to int number 
+	std::signal(SIGINT, close_app);    //  catch SIGINT, deal in close_app
 
-	pthread_t msg;
-        vector<int> opts = { SO_REUSEPORT, SO_REUSEADDR };
+	pthread_t msg;    // thread ID 
+        vector<int> opts = { SO_REUSEPORT, SO_REUSEADDR };  //mutil thread binding the same port 
 
-	if( tcp.setup(atoi(argv[1]),opts) == 0) {
-		if( pthread_create(&msg, NULL, received, (void *)0) == 0)
+	if( tcp.setup(atoi(argv[1]),opts) == 0) {         // socket found, bind ,listen 
+		if( pthread_create(&msg, NULL, received, (void *)0) == 0)    // thread  found  0:success
 		{
 			while(1) {
 				tcp.accepted();
