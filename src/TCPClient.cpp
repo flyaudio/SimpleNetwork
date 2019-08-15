@@ -7,21 +7,21 @@ TCPClient::TCPClient()
 	address = "";
 }
 
-bool TCPClient::setup(string address , int port)
+bool TCPClient::setup(string address , int port)    
 {
-  	if(sock == -1)
+  	if(sock == -1)        // socket initial  value is -1
 	{
-		sock = socket(AF_INET , SOCK_STREAM , 0);
+		sock = socket(AF_INET , SOCK_STREAM , 0); // socket found  AF_INET:IPV4  SOCK_STREAM:tcp stream  error return -1
 		if (sock == -1)
 		{
       			cout << "Could not create socket" << endl;
     		}
         }
-  	if((signed)inet_addr(address.c_str()) == -1)
+  	if((signed)inet_addr(address.c_str()) == -1)   //convert address  into  binary data 
   	{
     		struct hostent *he;
     		struct in_addr **addr_list;
-    		if ( (he = gethostbyname( address.c_str() ) ) == NULL)
+    		if ( (he = gethostbyname( address.c_str() ) ) == NULL)   //get host para 
     		{
 		      herror("gethostbyname");
       		      cout<<"Failed to resolve hostname\n";
@@ -36,11 +36,11 @@ bool TCPClient::setup(string address , int port)
   	}
   	else
   	{
-    		server.sin_addr.s_addr = inet_addr( address.c_str() );
+    		server.sin_addr.s_addr = inet_addr( address.c_str() );   // server address assigned
   	}
   	server.sin_family = AF_INET;
   	server.sin_port = htons( port );
-  	if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
+  	if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0) //connect server failed return -1 
   	{
     		perror("connect failed. Error");
     		return false;
@@ -50,9 +50,9 @@ bool TCPClient::setup(string address , int port)
 
 bool TCPClient::Send(string data)
 {
-	if(sock != -1) 
+	if(sock != -1)     // sock found success return not 1
 	{
-		if( send(sock , data.c_str() , strlen( data.c_str() ) , 0) < 0)
+		if( send(sock , data.c_str() , strlen( data.c_str() ) , 0) < 0)   //send success return bytes number
 		{
 			cout << "Send failed : " << data << endl;
 			return false;
@@ -69,7 +69,7 @@ string TCPClient::receive(int size)
 	memset(&buffer[0], 0, sizeof(buffer));
 
   	string reply;
-	if( recv(sock , buffer , size, 0) < 0)
+	if( recv(sock , buffer , size, 0) < 0)   // receive message store in buffer
   	{
 	    	cout << "receive failed!" << endl;
 		return nullptr;
@@ -84,7 +84,7 @@ string TCPClient::read()
   	char buffer[1] = {};
   	string reply;
   	while (buffer[0] != '\n') {
-    		if( recv(sock , buffer , sizeof(buffer) , 0) < 0)
+    		if( recv(sock , buffer , sizeof(buffer) , 0) < 0)    
     		{
       			cout << "receive failed!" << endl;
 			return nullptr;
@@ -96,5 +96,5 @@ string TCPClient::read()
 
 void TCPClient::exit()
 {
-    close( sock );
+    close( sock );    //close client socket
 }
